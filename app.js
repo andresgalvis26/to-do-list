@@ -89,7 +89,7 @@ const pintarTareas = () => {
     // Si la lista de tareas está vacia
     if(Object.values(tareas).length === 0) {
         listaTarea.innerHTML = `
-        <div class="alert alert-danger">
+        <div class="alert alert-danger text-center">
             👍👍 No hay tareas pendientes 👍👍
         </div>
         `      
