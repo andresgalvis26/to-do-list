@@ -6,6 +6,7 @@ const input = document.getElementById("input")
 // Acceder siempre al contenido del template
 const template = document.getElementById("template").content
 const fragment = document.createDocumentFragment()
+/*
 let tareas = {
     1: {
         id: 1,
@@ -23,8 +24,15 @@ let tareas = {
         estado: false
     }
 }
+*/
+let tareas = {}
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    // Validando que hayan objetos en el localStorage y si hay, parsearlo y obtenerlo
+    if(localStorage.getItem("tareas")){
+        tareas = JSON.parse(localStorage.getItem("tareas"))
+    }
     pintarTareas()
 })
 
@@ -74,6 +82,20 @@ const setTarea = e => {
 
 const pintarTareas = () => {
 
+    // Almacenando en localStorage las tareas que se tienen
+    localStorage.setItem("tareas", JSON.stringify(tareas))
+
+
+    // Si la lista de tareas está vacia
+    if(Object.values(tareas).length === 0) {
+        listaTarea.innerHTML = `
+        <div class="alert alert-danger text-center">
+            👍👍 No hay tareas pendientes 👍👍
+        </div>
+        `      
+    return 
+    }
+
     // Limpiando para que no se repitan los objetos al añadir nuevos
     listaTarea.innerHTML = ""
 
@@ -81,6 +103,14 @@ const pintarTareas = () => {
         // Primero hacer el clone - REGLA
         const clone = template.cloneNode(true)
         clone.querySelector("p").textContent = tarea.texto
+
+        // Cambiando el fondo, icono y tachar la tarea - Estilos
+        if(tarea.estado){
+            clone.querySelector(".alert").classList.replace("alert-warning", "alert-primary")
+            clone.querySelectorAll(".fas")[0].classList.replace("fa-check-circle", "fa-undo-alt")
+            clone.querySelector("p").style.textDecoration = "line-through"
+        }
+
         // Añadiendole un ID a los botones
         clone.querySelectorAll(".fas")[0].dataset.id = tarea.id
         clone.querySelectorAll(".fas")[1].dataset.id = tarea.id
@@ -96,14 +126,21 @@ const btnAccion = e => {
     if(e.target.classList.contains("fa-check-circle")){
         tareas[e.target.dataset.id].estado = true
         pintarTareas()
-        console.log(tareas)
+        //console.log(tareas)
+    }
+
+    // Cambiando el estado de la tarea de true a false
+    if(e.target.classList.contains("fa-undo-alt")){
+        tareas[e.target.dataset.id].estado = false
+        pintarTareas()
+        //console.log(tareas)
     }
 
     // Eliminando la tarea al oprimir el botón
     if(e.target.classList.contains("fa-minus-circle")){
         delete tareas[e.target.dataset.id]
         pintarTareas()
-        console.log(tareas)
+        //console.log(tareas)
     }
     // Decirle que solo active los eventos dentro del contenedor
     e.stopPropagation()
